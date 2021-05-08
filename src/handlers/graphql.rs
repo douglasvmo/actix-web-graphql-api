@@ -1,6 +1,8 @@
 use crate::Pool;
-use juniper::{EmptyMutation, RootNode};
+use juniper::{EmptyMutation, FieldError, RootNode};
 use std::sync::Arc;
+
+use crate::models::user::User;
 
 #[derive(Clone)]
 pub struct Context {
