@@ -14,8 +14,11 @@ pub fn app_config(config: &mut web::ServiceConfig) {
     config
         .data(schema)
         .service(web::resource("/").route(web::get().to(health)))
-        .service(web::resource("/graphql").route(web::post().to(graphql)))
-        .service(web::resource("/graphiql").route(web::get().to(graphiql)));
+        .service(
+            web::resource("/graphql")
+                .route(web::post().to(graphql))
+                .route(web::get().to(graphiql)),
+        );
 }
 
 async fn graphiql() -> HttpResponse {

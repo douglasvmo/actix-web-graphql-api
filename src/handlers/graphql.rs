@@ -1,5 +1,5 @@
 use crate::Pool;
-use juniper::{EmptyMutation, FieldError, RootNode};
+use juniper::{EmptyMutation, RootNode};
 use std::sync::Arc;
 
 use crate::models::user::User;
@@ -17,6 +17,10 @@ pub struct Query {}
 impl Query {
     async fn apiVersion() -> &str {
         "1.0"
+    }
+    async fn users(context: &Context) -> Vec<User> {
+        let conn = context.pool.get().unwrap();
+        User::all(&conn)
     }
 }
 

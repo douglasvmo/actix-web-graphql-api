@@ -1,11 +1,9 @@
+use crate::schema::users::dsl::*;
+use chrono::prelude::{DateTime, Utc};
+use diesel::{PgConnection, RunQueryDsl};
 use std::time::SystemTime;
 
-use crate::schema::users::dsl::*;
-use diesel::{PgConnection, RunQueryDsl};
-use juniper::GraphQLInputObject;
-use serde::{Deserialize, Serialize};
-
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Queryable)]
 pub struct User {
     pub id: i32,
     pub name: String,
@@ -16,12 +14,28 @@ pub struct User {
     pub updated_at: SystemTime,
 }
 
-#[derive(GraphQLInputObject)]
-pub struct CreateUser {
-    name: String,
-    email: String,
-    password: String,
-    active: bool,
+#[juniper::graphql_object]
+impl User {
+    fn id(&self) -> i32 {
+        self.id
+    }
+    fn name(&self) -> &str {
+        self.name.as_str()
+    }
+    fn email(&self) -> &str {
+        self.email.as_str()
+    }
+    fn active(&self) -> bool {
+        self.active
+    }
+    fn createAt(&self) -> String {
+        let dt: DateTime<Utc> = self.created_at.clone().into();
+        dt.format("%+").to_string()
+    }
+    fn updatedAt(&self) -> String {
+        let dt: DateTime<Utc> = self.updated_at.clone().into();
+        dt.format("%+").to_string()
+    }
 }
 
 impl User {
