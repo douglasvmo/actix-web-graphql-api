@@ -3,7 +3,7 @@ mod graphql;
 use crate::Pool;
 use actix_web::{web, HttpResponse};
 use graphql::{create_schema, Context, Schema};
-use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
+use juniper::{http::{GraphQLRequest, playground::playground_source}};
 
 async fn health() -> HttpResponse {
     HttpResponse::Ok().finish()
@@ -22,7 +22,7 @@ pub fn app_config(config: &mut web::ServiceConfig) {
 }
 
 async fn graphiql() -> HttpResponse {
-    let html = graphiql_source("/graphql", None);
+    let html = playground_source("/graphql", None);
 
     HttpResponse::Ok()
         .content_type("text/html; charse=utf-8")
@@ -36,7 +36,7 @@ async fn graphql(
 ) -> HttpResponse {
     let pool = pool.into_inner();
     let context = Context { pool };
-    let res = data.execute(&schema, &context).await;
+    let res = data.execute(&schema,&context).await;
 
     HttpResponse::Ok().json(res)
 }

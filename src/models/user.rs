@@ -1,6 +1,7 @@
-use crate::schema::users::dsl::*;
+use crate::schema::users;
 use chrono::prelude::{DateTime, Utc};
-use diesel::{PgConnection, RunQueryDsl};
+use diesel::{Insertable, PgConnection, RunQueryDsl};
+use juniper::GraphQLInputObject;
 use std::time::SystemTime;
 
 #[derive(Queryable)]
@@ -38,8 +39,23 @@ impl User {
     }
 }
 
+#[derive(Insertable)]
+#[table_name = "users"]
+pub struct NewUser<'a> {
+    pub name: &'a str,
+    pub email: &'a str,
+    pub password: &'a str,   
+}
+
+#[derive(GraphQLInputObject)]
+pub struct CreateUserInput {
+    pub name:String,
+    pub email: String,
+    pub password: String,
+}
+
 impl User {
     pub fn all(conn: &PgConnection) -> Vec<User> {
-        users.load::<User>(conn).expect("load users error")
+        users::dsl::users.load::<User>(conn).expect("load users error")
     }
 }

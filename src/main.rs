@@ -5,7 +5,7 @@ mod handlers;
 mod models;
 mod schema;
 
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, middleware};
 use diesel::r2d2::{self, ConnectionManager};
 use diesel::PgConnection;
 use dotenv::dotenv;
@@ -27,6 +27,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
+            .wrap(middleware::Logger::default())
             .configure(handlers::app_config)
     })
     .bind("127.0.0.1:8080")?
