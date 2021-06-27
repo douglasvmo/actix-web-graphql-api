@@ -1,10 +1,10 @@
-use crate::controllers::schema::{Context, Schema};
+use crate::graphql_schema::root::{Context, Schema};
 use crate::Pool;
 use actix_web::{web, HttpResponse};
-use juniper::http::{playground::playground_source, GraphQLRequest};
+use juniper::http::{playground, GraphQLRequest};
 
 pub async fn graphql_playground() -> HttpResponse {
-    let html = playground_source("/graphql", None);
+    let html = playground::playground_source("/graphql", None);
 
     HttpResponse::Ok()
         .content_type("text/html; charse=utf-8")

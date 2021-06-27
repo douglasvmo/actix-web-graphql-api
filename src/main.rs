@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
-mod controllers;
+mod graphql_schema;
 mod handlers;
 mod models;
 mod schema;
