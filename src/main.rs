@@ -6,7 +6,8 @@ mod handlers;
 mod models;
 mod schema;
 
-use actix_web::{App, HttpServer, middleware};
+use actix_web::web::Data;
+use actix_web::{middleware, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
 use diesel::PgConnection;
 use dotenv::dotenv;
@@ -25,9 +26,12 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
+    let schema = Data::new(graphql_schema::root::create_schema());
+
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
+            .app_data(schema.clone())
             .wrap(middleware::Logger::default())
             .configure(handlers::app_config)
     })

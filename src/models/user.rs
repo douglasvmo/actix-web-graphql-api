@@ -4,10 +4,11 @@ use std::time::SystemTime;
 
 #[derive(Queryable)]
 pub struct User {
-    pub id: i32,
+    pub id: uuid::Uuid,
     pub name: String,
     pub email: String,
     pub password: String,
+    pub access_type: String,
     pub active: bool,
     pub created_at: SystemTime,
     pub updated_at: SystemTime,

@@ -5,7 +5,7 @@ use juniper::{FieldError, FieldResult, GraphQLInputObject};
 
 #[juniper::graphql_object]
 impl User {
-    fn id(&self) -> i32 {
+    fn id(&self) -> uuid::Uuid {
         self.id
     }
     fn name(&self) -> &str {
@@ -13,6 +13,9 @@ impl User {
     }
     fn email(&self) -> &str {
         self.email.as_str()
+    }
+    fn access_type(&self) -> &str {
+        self.access_type.as_str()
     }
     fn active(&self) -> bool {
         self.active
