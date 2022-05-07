@@ -1,6 +1,7 @@
-use crate::Pool;
 use juniper::{EmptySubscription, RootNode};
 use std::sync::Arc;
+
+use crate::database::Pool;
 
 #[derive(Clone)]
 pub struct Context {

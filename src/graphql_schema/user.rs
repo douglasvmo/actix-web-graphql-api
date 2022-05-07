@@ -14,9 +14,6 @@ impl User {
     fn email(&self) -> &str {
         self.email.as_str()
     }
-    fn access_type(&self) -> &str {
-        self.access_type.as_str()
-    }
     fn active(&self) -> bool {
         self.active
     }
@@ -42,6 +39,7 @@ impl Query {
 struct UserInput {
     name: String,
     email: String,
+    cpf_cnpj: String,
     password: String,
 }
 
@@ -51,6 +49,7 @@ impl Mutation {
         let user = NewUser {
             name: &user.name,
             email: &user.email,
+            cpf_cnpj: &user.cpf_cnpj, 
             password: &user.password,
         };
         let conn = context.pool.get().unwrap();

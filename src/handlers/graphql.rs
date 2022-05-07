@@ -1,5 +1,4 @@
-use crate::graphql_schema::root::{Context, Schema};
-use crate::Pool;
+use crate::{graphql_schema::root::{Context, Schema}, database::Pool};
 use actix_web::{web, HttpResponse};
 use juniper::http::{playground, GraphQLRequest};
 

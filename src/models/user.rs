@@ -1,15 +1,18 @@
 use crate::schema::users;
 use diesel::{Insertable, PgConnection, RunQueryDsl};
+use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
-#[derive(Queryable)]
+#[derive(Queryable, Deserialize, Serialize)]
 pub struct User {
     pub id: uuid::Uuid,
     pub name: String,
     pub email: String,
+    pub cpf_cnpj: String,
     pub password: String,
-    pub access_type: String,
+    pub role_id: Option<i32>,
     pub active: bool,
+    pub verification_code: Option<String>,
     pub created_at: SystemTime,
     pub updated_at: SystemTime,
 }
@@ -19,6 +22,7 @@ pub struct User {
 pub struct NewUser<'a> {
     pub name: &'a str,
     pub email: &'a str,
+    pub cpf_cnpj: &'a str,
     pub password: &'a str,
 }
 
