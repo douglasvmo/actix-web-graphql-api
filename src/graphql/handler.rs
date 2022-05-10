@@ -1,8 +1,10 @@
-use crate::{graphql_schema::root::{Context, Schema}, database::Pool};
+use crate::graphql::model::{Context, Schema};
+use crate::database::Pool;
 use actix_web::{web, HttpResponse};
 use juniper::http::{playground, GraphQLRequest};
+use crate::jwt::model::BearerToken;
 
-pub async fn graphql_playground() -> HttpResponse {
+pub(super) async fn graphql_playground() -> HttpResponse {
     let html = playground::playground_source("/graphql", None);
 
     HttpResponse::Ok()
@@ -10,13 +12,14 @@ pub async fn graphql_playground() -> HttpResponse {
         .body(html)
 }
 
-pub async fn graphql(
+pub(super) async fn graphql(
+    token: BearerToken,
     data: web::Json<GraphQLRequest>,
     schema: web::Data<Schema>,
     pool: web::Data<Pool>,
 ) -> HttpResponse {
     let pool = pool.into_inner();
-    let context = Context { pool };
+    let context = Context { pool, token };
     let res = data.execute(&schema, &context).await;
 
     HttpResponse::Ok().json(res)

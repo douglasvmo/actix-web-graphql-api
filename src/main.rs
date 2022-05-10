@@ -2,10 +2,11 @@
 extern crate diesel;
 extern crate dotenv;
 mod database;
-mod graphql_schema;
-mod handlers;
+mod graphql;
 mod models;
 mod schema;
+mod users;
+mod jwt;
 
 
 use actix_web::web::Data;
@@ -20,14 +21,14 @@ async fn main() -> std::io::Result<()> {
     //create db connection pool
     let pool = database::pool::init_pool();
     
-    let schema = Data::new(graphql_schema::root::create_schema());
+    let schema = Data::new(graphql::model::create_schema());
 
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
             .app_data(schema.clone())
             .wrap(middleware::Logger::default())
-            .configure(handlers::app_config)
+            .configure(graphql::routes)
     })
     .bind("127.0.0.1:8080")?
     .run()
