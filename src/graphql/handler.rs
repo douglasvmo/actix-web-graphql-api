@@ -18,7 +18,6 @@ pub(super) async fn graphql(
     schema: web::Data<Schema>,
     pool: web::Data<Pool>,
 ) -> HttpResponse {
-    let pool = pool.into_inner();
     let context = Context { pool, token };
     let res = data.execute(&schema, &context).await;
 

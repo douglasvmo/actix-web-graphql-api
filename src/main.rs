@@ -3,8 +3,8 @@ extern crate diesel;
 extern crate dotenv;
 mod database;
 mod graphql;
-mod models;
 mod schema;
+mod errors;
 mod users;
 mod jwt;
 

@@ -1,7 +1,8 @@
 use crate::schema::users;
 use chrono::NaiveDateTime;
 use diesel::Insertable;
-use serde::{Deserialize, Serialize};
+use juniper::GraphQLInputObject;
+use ::serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, Queryable, juniper::GraphQLObject)]
 pub struct User {
@@ -13,12 +14,13 @@ pub struct User {
     pub password: String,
     pub role_id: Option<i32>,
     pub active: bool,
+    #[graphql(skip)]
     pub verification_code: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Insertable, GraphQLInputObject)]
 #[table_name = "users"]
 pub struct InsertableUser {
     pub name: String,
