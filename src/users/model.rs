@@ -28,3 +28,9 @@ pub struct InsertableUser {
     pub cpf_cnpj: String,
     pub password: String,
 }
+
+#[derive(Debug, GraphQLInputObject)]
+pub struct UserLogin {
+    pub login: String,
+    pub password: String,
+}

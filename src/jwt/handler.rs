@@ -1,9 +1,9 @@
 use actix_web::{http::header, dev::Payload, Error, FromRequest, HttpRequest};
 use juniper::futures;
-use super::model::BearerToken;
+use super::model::DecodedToken;
 
 
-impl FromRequest for BearerToken {
+impl FromRequest for DecodedToken {
     type Error = Error;
     type Future = futures::future::Ready<Result<Self, Self::Error>>;
     type Config = ();
@@ -13,6 +13,6 @@ impl FromRequest for BearerToken {
         .headers()
         .get(header::AUTHORIZATION);
 
-        futures::future::ready(Ok(BearerToken{jwt: None}))
+        futures::future::ready(Ok(Self{jwt: None}))
     }
 }

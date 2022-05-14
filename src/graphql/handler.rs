@@ -1,8 +1,11 @@
+use std::fmt::Debug;
+use std::sync::Arc;
+
+use crate::database::PoolConnection;
 use crate::graphql::model::{Context, Schema};
-use crate::database::Pool;
-use actix_web::{web, HttpResponse};
+use crate::jwt::model::DecodedToken;
+use actix_web::{web, Error, HttpResponse};
 use juniper::http::{playground, GraphQLRequest};
-use crate::jwt::model::BearerToken;
 
 pub(super) async fn graphql_playground() -> HttpResponse {
     let html = playground::playground_source("/graphql", None);
@@ -13,13 +16,15 @@ pub(super) async fn graphql_playground() -> HttpResponse {
 }
 
 pub(super) async fn graphql(
-    token: BearerToken,
+    token: DecodedToken,
     data: web::Json<GraphQLRequest>,
-    schema: web::Data<Schema>,
-    pool: web::Data<Pool>,
-) -> HttpResponse {
-    let context = Context { pool, token };
+    schema: web::Data<Arc<Schema>>,
+    pool: web::Data<PoolConnection>,
+) -> Result<HttpResponse, Error> {
+    let context = Context::new(pool.as_ref().to_owned(), token);
     let res = data.execute(&schema, &context).await;
 
-    HttpResponse::Ok().json(res)
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .json(res))
 }
