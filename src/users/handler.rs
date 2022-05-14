@@ -1,9 +1,7 @@
-use super::model::{InsertableUser, User, UserLogin};
+use super::model::{InsertableUser, User};
 use crate::errors::{ServiceError, ServiceResult};
 use crate::schema::users;
-
 use diesel::prelude::*;
-use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 impl User {
     pub fn get_users(coon: &PgConnection) -> ServiceResult<Vec<User>> {
@@ -18,19 +16,25 @@ impl User {
         Ok(new_user)
     }
 
-    pub fn Login(login_data: UserLogin, conn: &PgConnection) -> ServiceResult<Option<String>> {
+    pub fn get_by_login(login: String, conn: &PgConnection) -> ServiceResult<User> {
         let user = users::dsl::users
-            .filter(users::cpf_cnpj.eq(login_data.login))
-            .first::<User>(conn)?;
+            .filter(users::cpf_cnpj.eq(login.clone()))
+            .or_filter(users::email.eq(login))
+            .first::<User>(conn)
+            .map_err(|_| ServiceError::Unauthorized)?;
+        Ok(user)
+    }
 
-        if user.password == login_data.password {
-            let chaims = crate::jwt::model::Claims::new(user.id, 1);
-            let head = Header::new(Algorithm::HS512);
-            let key = EncodingKey::from_secret("cat".as_ref());
-            let token = encode(&head, &chaims, &key).map_err(|_| ServiceError::Unauthorized)?;
-            Ok(Some(token))
+    pub fn check_password(&self, paswd: String) -> ServiceResult<&User> {
+        if self.password == paswd {
+            Ok(self)
         } else {
-            Ok(None)
+            Result::Err(ServiceError::Unauthorized)
         }
+    }
+
+    pub fn get_id(id: &str, conn: &PgConnection) -> ServiceResult<User> {
+        let user_uuid = uuid::Uuid::parse_str(id).map_err(|e| ServiceError::BadRequest)?;
+        Ok(users::dsl::users.find(user_uuid).first(conn)?)
     }
 }
