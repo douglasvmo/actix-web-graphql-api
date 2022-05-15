@@ -36,7 +36,7 @@ impl Query {
         Ok(User::get_users(&conn)?)
     }
 
-    fn hoami(context: &Context) -> ServiceResult<User> {
+    fn whoami(context: &Context) -> ServiceResult<User> {
         let id = context.token.get_id()?;
         let conn = get_conn(&context.db)?;
         Ok(User::get_id(&id, &conn)?)
@@ -50,10 +50,11 @@ impl Mutation {
         Ok(User::register(user, &conn)?)
     }
 
-    pub fn get_token_login(context: &Context, user_login: UserLogin) -> ServiceResult<String> {
+    pub fn token(context: &Context, user_login: UserLogin) -> ServiceResult<String> {
+        let UserLogin { login, password } = user_login;
         let conn = get_conn(&context.db)?;
-        let user = User::get_by_login(user_login.login, &conn)?;
-        let auth_user = user.check_password(user_login.password)?;
+        let user = User::get_by_login(login, &conn)?;
+        let auth_user = user.check_password(password)?;
         Ok(create_token(auth_user)?)
     }
 }
