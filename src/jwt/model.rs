@@ -10,7 +10,7 @@ pub struct DecodedToken {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub exp: i64,
-    pub sub: String,
+    pub id: String,
 }
 
 impl Claims {
@@ -20,15 +20,15 @@ impl Claims {
 
         Self {
             exp: exp.timestamp(),
-            sub: id.to_string(),
+            id: id.to_string(),
         }
     }
 }
 
 impl DecodedToken {
-    pub fn get_id(&self) -> ServiceResult<String> {
+    pub fn get_auth(&self) -> ServiceResult<Claims> {
         match self.jwt.clone() {
-            Some(jwt) => Ok(jwt.sub),
+            Some(jwt) => Ok(jwt),
             None => Err(ServiceError::Unauthorized),
         }
     }

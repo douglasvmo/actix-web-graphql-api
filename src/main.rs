@@ -2,15 +2,14 @@
 extern crate diesel;
 extern crate dotenv;
 mod database;
-mod graphql;
-mod schema;
 mod errors;
-mod users;
+mod graphql;
 mod jwt;
+mod schema;
+mod users;
 
 use actix_web::{middleware, App, HttpServer};
 use dotenv::dotenv;
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,7 +17,6 @@ async fn main() -> std::io::Result<()> {
 
     //create db connection pool
     let pool = database::init_pool();
-    
 
     HttpServer::new(move || {
         App::new()

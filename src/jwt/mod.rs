@@ -1,8 +1,6 @@
-use futures::channel::mpsc::channel;
-use jsonwebtoken::{decode, DecodingKey, Validation};
-
 use crate::errors::ServiceError;
 use crate::users::model::User;
+use jsonwebtoken::{decode, DecodingKey, Validation};
 
 use self::model::Claims;
 
