@@ -40,7 +40,7 @@ pub struct InsertableLogin {
 
 #[derive(Debug, Insertable, GraphQLInputObject)]
 #[table_name = "users"]
-pub struct InsertableUser {
+pub struct NewUser {
     pub name: String,
     pub email: String,
     pub cpf_cnpj: String,
@@ -69,7 +69,7 @@ fn hash_encode(password: String, salt: &str) -> String {
 }
 
 impl User {
-    pub fn new(mut user_data: InsertableUser, conn: &PgConnection) -> ServiceResult<User> {
+    pub fn new(mut user_data: NewUser, conn: &PgConnection) -> ServiceResult<User> {
         use self::users::dsl::*;
         user_data.password = hash_encode(user_data.password, &user_data.email);
 

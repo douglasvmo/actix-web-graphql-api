@@ -3,7 +3,7 @@ pub mod model;
 use crate::errors::ServiceResult;
 use crate::graphql::model::{Context, Mutation, Query};
 use crate::jwt::create_token;
-use model::{InsertableUser, User, UserAuth};
+use model::{NewUser, User, UserAuth};
 
 #[derive(Debug, juniper::GraphQLInputObject)]
 pub struct UserLogin {
@@ -27,7 +27,7 @@ impl Query {
 
 #[juniper::graphql_object(context = Context)]
 impl Mutation {
-    pub fn register_user(context: &Context, user: InsertableUser) -> ServiceResult<User> {
+    pub fn register_user(context: &Context, user: NewUser) -> ServiceResult<User> {
         let conn = context.get_conn()?;
         Ok(User::new(user, &conn)?)
     }
