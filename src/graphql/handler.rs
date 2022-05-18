@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::database::PoolConnection;
 use crate::graphql::model::{Context, Schema};
-use crate::jwt::model::DecodedToken;
+use crate::jwt::AuthorizationService;
 use actix_web::{web, HttpResponse};
 use juniper::http::{playground, GraphQLRequest};
 
@@ -15,12 +15,12 @@ pub(super) async fn graphql_playground() -> HttpResponse {
 }
 
 pub(super) async fn graphql(
-    token: DecodedToken,
+    auth: AuthorizationService,
     data: web::Json<GraphQLRequest>,
     schema: web::Data<Arc<Schema>>,
     pool: web::Data<PoolConnection>,
 ) -> HttpResponse {
-    let context = Context::new(pool.as_ref().to_owned(), token);
+    let context = Context::new(pool.into_inner(), auth);
 
     let res = data.execute_sync(&schema, &context);
 

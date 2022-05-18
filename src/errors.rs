@@ -1,14 +1,14 @@
-use actix_web::{HttpResponse, ResponseError, http};
+use actix_web::{http, HttpResponse, ResponseError};
 use diesel::result::Error as DBError;
 use juniper::ScalarValue;
 use serde::Serialize;
-use std::convert::From;
+use std::{convert::From, fmt::Debug};
 use thiserror::Error;
 
 #[derive(Debug, Error, Serialize, derive_more::Display)]
 pub enum ServiceError {
     InternalServerError,
-    BadRequest,
+    BadRequest { message: String },
     Unauthorized,
     UnableToConnectToDb,
 }
@@ -17,10 +17,11 @@ impl<S: ScalarValue> juniper::IntoFieldError<S> for ServiceError {
     fn into_field_error(self) -> juniper::FieldError<S> {
         use juniper::graphql_value;
         match self {
-            ServiceError::BadRequest => juniper::FieldError::new(
+            ServiceError::BadRequest { message } => juniper::FieldError::new(
                 "Not expected",
                 graphql_value!({
-                    "type": "BAD_REQUEST"
+                    "type": "BAD_REQUEST",
+                    "message": message
                 }),
             ),
             ServiceError::InternalServerError => juniper::FieldError::new(
@@ -53,7 +54,7 @@ impl ResponseError for ServiceError {
             }
             ServiceError::UnableToConnectToDb => HttpResponse::InternalServerError()
                 .json("Unable to connect to DB, Please try later"),
-            ServiceError::BadRequest => HttpResponse::BadRequest().json(""),
+            ServiceError::BadRequest { message } => HttpResponse::BadRequest().json(message),
             ServiceError::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
         }
     }
@@ -62,7 +63,7 @@ impl ResponseError for ServiceError {
         match self {
             ServiceError::InternalServerError => http::StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::UnableToConnectToDb => http::StatusCode::INTERNAL_SERVER_ERROR,
-            ServiceError::BadRequest => http::StatusCode::BAD_REQUEST,
+            ServiceError::BadRequest { message } => http::StatusCode::BAD_REQUEST,
             ServiceError::Unauthorized => http::StatusCode::UNAUTHORIZED,
         }
     }
@@ -71,7 +72,9 @@ impl ResponseError for ServiceError {
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> Self {
         match error {
-            DBError::DatabaseError(_kind, info) => ServiceError::BadRequest,
+            DBError::DatabaseError(_kind, info) => ServiceError::BadRequest {
+                message: "diesel".to_string(),
+            },
             _ => ServiceError::InternalServerError,
         }
     }

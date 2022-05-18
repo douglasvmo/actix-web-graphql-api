@@ -5,8 +5,9 @@ mod database;
 mod errors;
 mod graphql;
 mod jwt;
+mod models;
+mod repositories;
 mod schema;
-mod users;
 
 use actix_web::{middleware, App, HttpServer};
 use dotenv::dotenv;

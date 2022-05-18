@@ -1,5 +1,5 @@
 use super::decode_token;
-use super::model::DecodedToken;
+use super::AuthorizationService;
 use actix_web::{dev::Payload, http::header, Error, FromRequest, HttpRequest};
 use juniper::futures;
 
@@ -7,7 +7,7 @@ lazy_static::lazy_static! {
     static ref BEARER_REGEXP: regex::Regex = regex::Regex::new(r"^Bearer\s(.*)$").expect("Bearer regexp failed!");
 }
 
-impl FromRequest for DecodedToken {
+impl FromRequest for AuthorizationService {
     type Error = Error;
     type Future = futures::future::Ready<Result<Self, Self::Error>>;
     type Config = ();
@@ -24,12 +24,6 @@ impl FromRequest for DecodedToken {
             })
             .map(|v| v.as_str());
 
-        futures::future::ready(Ok(match token {
-            None => Self { jwt: None },
-            Some(token) => match decode_token(token) {
-                Ok(decoded) => Self { jwt: Some(decoded) },
-                Err(_) => Self { jwt: None },
-            },
-        }))
+        futures::future::ready(Ok(Self::new(token)))
     }
 }

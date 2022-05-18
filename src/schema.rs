@@ -10,7 +10,7 @@ table! {
 table! {
     goals (id) {
         id -> Uuid,
-        projects_id -> Nullable<Uuid>,
+        project_id -> Nullable<Uuid>,
         name -> Varchar,
         description -> Varchar,
         deadline -> Timestamp,
@@ -33,7 +33,7 @@ table! {
 table! {
     tasks (id) {
         id -> Uuid,
-        projects_id -> Nullable<Uuid>,
+        project_id -> Nullable<Uuid>,
         name -> Varchar,
         description -> Varchar,
         done -> Bool,
@@ -51,23 +51,23 @@ table! {
         password -> Varchar,
         role_id -> Nullable<Int4>,
         active -> Bool,
-        verification_code -> Nullable<Varchar>,
+        verification_payload -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
 table! {
-    users_to_projects (user_id, projects_id) {
+    users_to_projects (user_id, project_id) {
         user_id -> Uuid,
-        projects_id -> Uuid,
+        project_id -> Uuid,
     }
 }
 
 joinable!(auths -> users (user_id));
-joinable!(goals -> projects (projects_id));
-joinable!(tasks -> projects (projects_id));
-joinable!(users_to_projects -> projects (projects_id));
+joinable!(goals -> projects (project_id));
+joinable!(tasks -> projects (project_id));
+joinable!(users_to_projects -> projects (project_id));
 joinable!(users_to_projects -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
