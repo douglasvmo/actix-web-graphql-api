@@ -8,7 +8,7 @@ use thiserror::Error;
 #[derive(Debug, Error, Serialize, derive_more::Display)]
 pub enum ServiceError {
     InternalServerError,
-    BadRequest { message: String },
+    BadRequest(String),
     Unauthorized,
     UnableToConnectToDb,
 }
@@ -17,11 +17,10 @@ impl<S: ScalarValue> juniper::IntoFieldError<S> for ServiceError {
     fn into_field_error(self) -> juniper::FieldError<S> {
         use juniper::graphql_value;
         match self {
-            ServiceError::BadRequest { message } => juniper::FieldError::new(
+            ServiceError::BadRequest(msg) => juniper::FieldError::new(
                 "Not expected",
                 graphql_value!({
-                    "type": "BAD_REQUEST",
-                    "message": message
+                    "type": msg
                 }),
             ),
             ServiceError::InternalServerError => juniper::FieldError::new(
@@ -54,7 +53,7 @@ impl ResponseError for ServiceError {
             }
             ServiceError::UnableToConnectToDb => HttpResponse::InternalServerError()
                 .json("Unable to connect to DB, Please try later"),
-            ServiceError::BadRequest { message } => HttpResponse::BadRequest().json(message),
+            ServiceError::BadRequest(msg) => HttpResponse::BadRequest().json(msg),
             ServiceError::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
         }
     }
@@ -63,7 +62,7 @@ impl ResponseError for ServiceError {
         match self {
             ServiceError::InternalServerError => http::StatusCode::INTERNAL_SERVER_ERROR,
             ServiceError::UnableToConnectToDb => http::StatusCode::INTERNAL_SERVER_ERROR,
-            ServiceError::BadRequest { message } => http::StatusCode::BAD_REQUEST,
+            ServiceError::BadRequest(_) => http::StatusCode::BAD_REQUEST,
             ServiceError::Unauthorized => http::StatusCode::UNAUTHORIZED,
         }
     }
@@ -72,9 +71,9 @@ impl ResponseError for ServiceError {
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> Self {
         match error {
-            DBError::DatabaseError(_kind, info) => ServiceError::BadRequest {
-                message: "diesel".to_string(),
-            },
+            DBError::DatabaseError(_kind, info) => {
+                ServiceError::BadRequest(info.message().to_string())
+            }
             _ => ServiceError::InternalServerError,
         }
     }
