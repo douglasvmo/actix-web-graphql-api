@@ -11,10 +11,8 @@ pub type PoolConnection = Pool<ConnectionManager>;
 
 pub type Connection = PooledConnection<ConnectionManager>;
 
-pub(crate) fn init_pool() -> PoolConnection {
-    let database_url = std::env::var("DATABASE_URL").expect("set DATABASE_URL");
+pub(crate) fn init_pool(database_url: String) -> PoolConnection {
     let mgr = ConnectionManager::new(database_url);
-
     Pool::builder().build(mgr).expect("Failed to create pool")
 }
 
