@@ -1,5 +1,5 @@
 use crate::database::{get_conn, PoolConnection};
-use crate::errors::{ServiceError, ServiceResult};
+use crate::errors::ServiceResult;
 use crate::models::user::{hash_encode, NewUser, User};
 use crate::schema::users;
 use diesel::prelude::*;

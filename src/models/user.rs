@@ -1,6 +1,5 @@
 use crate::schema::users;
 use chrono::NaiveDateTime;
-use juniper::GraphQLInputObject;
 use serde::{Deserialize, Serialize};
 
 #[derive(Identifiable, Debug, Serialize, Deserialize, Queryable, juniper::GraphQLObject)]
@@ -20,7 +19,7 @@ pub struct User {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable, GraphQLInputObject)]
+#[derive(Debug, Insertable, juniper::GraphQLInputObject)]
 #[table_name = "users"]
 pub struct NewUser {
     pub name: String,

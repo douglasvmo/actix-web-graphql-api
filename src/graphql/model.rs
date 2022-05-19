@@ -3,6 +3,7 @@ use crate::errors::{ServiceError, ServiceResult};
 use crate::jwt::AuthorizationService;
 use crate::models::user::{NewUser, User};
 use crate::repositories::auth::AuthRepository;
+use crate::repositories::project::ProjectRepository;
 use crate::repositories::user::UserRepository;
 use juniper::Context as JuniperContext;
 use std::sync::Arc;
@@ -24,6 +25,9 @@ impl Context {
     }
     pub fn auth_repository(&self) -> AuthRepository {
         AuthRepository::new(self.pool.clone())
+    }
+    pub fn project_repository(&self) -> ProjectRepository {
+        ProjectRepository::new(self.pool.clone())
     }
 }
 
