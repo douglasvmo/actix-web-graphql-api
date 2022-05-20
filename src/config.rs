@@ -16,7 +16,7 @@ impl ServerConfig {
         let database_url = std::env::var("DATABASE_URL").expect("set DATABASE_URL");
         let secret_key = std::env::var("SECRET_KEY").expect("set SECRET_KEY");
         let url = std::env::var("URL").expect("set URL");
-        let host = std::env::var("HOST").unwrap_or("127.0.0.1".to_string());
+        let host = std::env::var("HOST").unwrap_or("0.0.0.0".to_string());
         let port = std::env::var("PORT").unwrap().parse::<i32>().unwrap();
 
         Self {
